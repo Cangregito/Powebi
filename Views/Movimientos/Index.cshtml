@@ -2,11 +2,19 @@
 
 @{
     ViewData["Title"] = "Movimientos";
+    int currentPage = ViewBag.Page ?? 1;
+    int pageSize = ViewBag.PageSize ?? 200;
+    int totalPages = ViewBag.TotalPages ?? 1;
+    int totalRecords = ViewBag.TotalRecords ?? 0;
 }
 
 <div class="page-header">
     <h1>Movimientos de Inventario</h1>
     <a asp-action="Create" class="btn-primary">Registrar Movimiento</a>
+</div>
+
+<div class="paginacion-resumen">
+    Mostrando pagina @currentPage de @totalPages (@totalRecords registros totales).
 </div>
 
 <div class="tabla-contenedor">
@@ -34,4 +42,18 @@
         }
         </tbody>
     </table>
+</div>
+
+<div class="paginacion-contenedor">
+     <a class="btn btn-outline-secondary @(currentPage <= 1 ? "disabled" : string.Empty)"
+         asp-action="Index"
+         asp-route-page="@(currentPage - 1)"
+         asp-route-pageSize="@pageSize">Anterior</a>
+
+     <span class="paginacion-actual">Pagina @currentPage / @totalPages</span>
+
+     <a class="btn btn-outline-secondary @(currentPage >= totalPages ? "disabled" : string.Empty)"
+         asp-action="Index"
+         asp-route-page="@(currentPage + 1)"
+         asp-route-pageSize="@pageSize">Siguiente</a>
 </div>

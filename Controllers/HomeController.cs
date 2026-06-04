@@ -10,11 +10,13 @@ public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
     private readonly AppDbContext _context;
+    private readonly IConfiguration _configuration;
 
-    public HomeController(ILogger<HomeController> logger, AppDbContext context)
+    public HomeController(ILogger<HomeController> logger, AppDbContext context, IConfiguration configuration)
     {
         _logger = logger;
         _context = context;
+        _configuration = configuration;
     }
 
     public async Task<IActionResult> Index()
@@ -36,6 +38,13 @@ public class HomeController : Controller
 
     public IActionResult Privacy()
     {
+        return View();
+    }
+
+    public IActionResult PowerBI()
+    {
+        ViewData["PowerBIEmbedUrl"] = _configuration["PowerBI:EmbedUrl"];
+        ViewData["PowerBIReportName"] = _configuration["PowerBI:ReportName"] ?? "Dashboard de Inventario";
         return View();
     }
 

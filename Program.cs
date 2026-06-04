@@ -2,6 +2,7 @@ using InventarioApp.Data;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 
+var seedMassiveOnly = args.Any(a => string.Equals(a, "--seed-massive", StringComparison.OrdinalIgnoreCase));
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -44,6 +45,18 @@ using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     dbContext.Database.Migrate();
+
+    var seedOptions = builder.Configuration.GetSection("MassiveSeed").Get<MassiveSeedOptions>() ?? new MassiveSeedOptions();
+    if (seedMassiveOnly || seedOptions.EnabledOnStartup)
+    {
+        var result = await MassiveDataSeeder.SeedAsync(dbContext, seedOptions);
+        Console.WriteLine($"[MassiveSeed] skipped={result.Skipped} categoriesAdded={result.CategoriesAdded} productsAdded={result.ProductsAdded} movementsAdded={result.MovementsAdded} finalCategories={result.FinalCategories} finalProducts={result.FinalProducts} finalMovements={result.FinalMovements}");
+    }
+}
+
+if (seedMassiveOnly)
+{
+    return;
 }
 
 app.MapControllerRoute(

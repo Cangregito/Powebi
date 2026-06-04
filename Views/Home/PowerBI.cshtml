@@ -1,0 +1,36 @@
+@{
+    ViewData["Title"] = "Dashboard Power BI";
+    var embedUrl = (ViewData["PowerBIEmbedUrl"] as string) ?? string.Empty;
+    var reportName = (ViewData["PowerBIReportName"] as string) ?? "Dashboard de Inventario";
+}
+
+<div class="page-header">
+    <h1>Dashboard Power BI</h1>
+</div>
+
+<p class="mb-3">Visualiza el reporte analitico directamente dentro de la aplicacion.</p>
+
+@if (string.IsNullOrWhiteSpace(embedUrl))
+{
+    <div class="alert alert-warning" role="alert">
+        Falta configurar la URL de insercion de Power BI.
+        Define <strong>PowerBI:EmbedUrl</strong> en el archivo de configuracion para activar el iframe.
+    </div>
+}
+else
+{
+    <div class="powerbi-frame-wrap">
+        <iframe
+            title="@reportName"
+            src="@embedUrl"
+            class="powerbi-frame"
+            frameborder="0"
+            allowfullscreen="true">
+        </iframe>
+    </div>
+}
+
+<div class="d-flex flex-wrap gap-2 mt-3">
+    <a class="btn btn-outline-primary" asp-controller="Export" asp-action="Index">Actualizar datos CSV</a>
+    <a class="btn btn-outline-secondary" asp-controller="Home" asp-action="Index">Volver al panel</a>
+</div>

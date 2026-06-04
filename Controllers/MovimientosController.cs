@@ -15,12 +15,29 @@ public class MovimientosController : Controller
         _context = context;
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(int page = 1, int pageSize = 200)
     {
+        page = Math.Max(1, page);
+        pageSize = Math.Clamp(pageSize, 50, 500);
+
+        var totalRegistros = await _context.Movimientos.CountAsync();
+        var totalPaginas = Math.Max(1, (int)Math.Ceiling(totalRegistros / (double)pageSize));
+        if (page > totalPaginas)
+        {
+            page = totalPaginas;
+        }
+
         var movimientos = await _context.Movimientos
             .Include(m => m.Producto)
             .OrderByDescending(m => m.Fecha)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync();
+
+        ViewBag.Page = page;
+        ViewBag.PageSize = pageSize;
+        ViewBag.TotalPages = totalPaginas;
+        ViewBag.TotalRecords = totalRegistros;
 
         return View(movimientos);
     }

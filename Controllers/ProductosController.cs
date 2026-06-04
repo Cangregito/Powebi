@@ -15,12 +15,29 @@ public class ProductosController : Controller
         _context = context;
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(int page = 1, int pageSize = 100)
     {
+        page = Math.Max(1, page);
+        pageSize = Math.Clamp(pageSize, 20, 200);
+
+        var totalRegistros = await _context.Productos.CountAsync();
+        var totalPaginas = Math.Max(1, (int)Math.Ceiling(totalRegistros / (double)pageSize));
+        if (page > totalPaginas)
+        {
+            page = totalPaginas;
+        }
+
         var productos = await _context.Productos
             .Include(p => p.Categoria)
             .OrderBy(p => p.Nombre)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync();
+
+        ViewBag.Page = page;
+        ViewBag.PageSize = pageSize;
+        ViewBag.TotalPages = totalPaginas;
+        ViewBag.TotalRecords = totalRegistros;
 
         return View(productos);
     }

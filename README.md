@@ -102,6 +102,7 @@ Completado:
 - Estilos responsivos con Grid para Inventario
 - Exportacion CSV para alimentar Power BI
 - App desplegada en Railway y validada en produccion
+- Paginacion server-side en Inventario y Movimientos para pruebas con alto volumen
 
 Pendiente:
 

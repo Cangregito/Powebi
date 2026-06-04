@@ -53,3 +53,16 @@ Se considera cerrado cuando:
 - El enlace abre el reporte.
 - Los KPIs coinciden con los datos de la app.
 - Los filtros por Categoria y Tipo funcionan.
+
+## 7. Incluir Power BI dentro de la app web (iframe)
+
+Si quieres ver el dashboard dentro de la misma aplicacion MVC:
+
+1. En Power BI Service abre el reporte y usa Archivo > Insertar informe > Sitio web o portal.
+2. Copia la URL de insercion (embed URL).
+3. Abre `appsettings.json` y pega la URL en `PowerBI:EmbedUrl`.
+4. Ejecuta la app y entra al menu Dashboard BI.
+
+Notas:
+- En algunos tenants, Publish to web puede estar bloqueado por politicas.
+- Para un escenario corporativo seguro, usar Power BI Embedded con autenticacion y token.
