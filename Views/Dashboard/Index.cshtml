@@ -1,0 +1,257 @@
+@{
+    ViewData["Title"] = "Dashboard Analítico";
+    Layout = "~/Views/Shared/_LayoutDashboard.cshtml";
+}
+
+<div class="dash-header">
+    <div>
+        <h1 class="dash-title">Dashboard Analítico</h1>
+        <p class="dash-subtitle">Métricas en tiempo real del sistema de inventario</p>
+    </div>
+    <div class="dash-refresh">
+        <span class="dash-updated" id="lastUpdate"></span>
+        <button class="btn-refresh" onclick="loadAll()">&#8635; Actualizar</button>
+    </div>
+</div>
+
+<!-- KPI CARDS -->
+<div class="kpi-grid" id="kpiGrid">
+    <div class="kpi-card kpi-blue">
+        <div class="kpi-icon">&#128230;</div>
+        <div class="kpi-body">
+            <div class="kpi-value" id="kpiProductos">—</div>
+            <div class="kpi-label">Total Productos</div>
+        </div>
+    </div>
+    <div class="kpi-card kpi-green">
+        <div class="kpi-icon">&#128200;</div>
+        <div class="kpi-body">
+            <div class="kpi-value" id="kpiMovimientos">—</div>
+            <div class="kpi-label">Movimientos</div>
+        </div>
+    </div>
+    <div class="kpi-card kpi-orange">
+        <div class="kpi-icon">&#9888;</div>
+        <div class="kpi-body">
+            <div class="kpi-value" id="kpiCriticos">—</div>
+            <div class="kpi-label">Stock Crítico</div>
+        </div>
+    </div>
+    <div class="kpi-card kpi-purple">
+        <div class="kpi-icon">&#128176;</div>
+        <div class="kpi-body">
+            <div class="kpi-value" id="kpiValor">—</div>
+            <div class="kpi-label">Valor Inventario</div>
+        </div>
+    </div>
+    <div class="kpi-card kpi-teal">
+        <div class="kpi-icon">&#128200;</div>
+        <div class="kpi-body">
+            <div class="kpi-value" id="kpiEntradas">—</div>
+            <div class="kpi-label">Entradas</div>
+        </div>
+    </div>
+    <div class="kpi-card kpi-red">
+        <div class="kpi-icon">&#128201;</div>
+        <div class="kpi-body">
+            <div class="kpi-value" id="kpiSalidas">—</div>
+            <div class="kpi-label">Salidas</div>
+        </div>
+    </div>
+</div>
+
+<!-- CHARTS ROW 1 -->
+<div class="charts-row">
+    <div class="chart-card chart-wide">
+        <div class="chart-card-header">
+            <h3>Movimientos por Mes</h3>
+            <span class="chart-badge">Últimos 12 meses</span>
+        </div>
+        <div id="chartMovimientos"></div>
+    </div>
+    <div class="chart-card chart-narrow">
+        <div class="chart-card-header">
+            <h3>Balance Movimientos</h3>
+            <span class="chart-badge">Entradas vs Salidas</span>
+        </div>
+        <div id="chartDona"></div>
+    </div>
+</div>
+
+<!-- CHARTS ROW 2 -->
+<div class="charts-row">
+    <div class="chart-card chart-narrow">
+        <div class="chart-card-header">
+            <h3>Estado de Stock</h3>
+            <span class="chart-badge">Distribución</span>
+        </div>
+        <div id="chartEstado"></div>
+    </div>
+    <div class="chart-card chart-wide">
+        <div class="chart-card-header">
+            <h3>Stock por Categoría</h3>
+            <span class="chart-badge">Top 12</span>
+        </div>
+        <div id="chartCategorias"></div>
+    </div>
+</div>
+
+<!-- CHARTS ROW 3 -->
+<div class="charts-row">
+    <div class="chart-card chart-full">
+        <div class="chart-card-header">
+            <h3>Top 10 Productos por Valor de Inventario</h3>
+            <span class="chart-badge">Stock × Precio Unitario</span>
+        </div>
+        <div id="chartTopProductos"></div>
+    </div>
+</div>
+
+@section Scripts {
+<script src="https://cdn.jsdelivr.net/npm/apexcharts@3.49.0/dist/apexcharts.min.js"></script>
+<script>
+const PALETTE = {
+    blue:   '#1a3c5e',
+    green:  '#2a9d8f',
+    orange: '#f4a261',
+    red:    '#e63946',
+    purple: '#7b2d8b',
+    teal:   '#48cae4',
+    yellow: '#ffb703',
+    gray:   '#6c757d'
+};
+
+const baseOpts = {
+    chart: { fontFamily: "'Segoe UI', sans-serif", toolbar: { show: false }, animations: { enabled: true, speed: 700 } },
+    tooltip: { theme: 'light' },
+    grid: { borderColor: '#f0f0f0' }
+};
+
+let charts = {};
+
+function fmt(n) {
+    if (n >= 1_000_000) return '$' + (n / 1_000_000).toFixed(1) + 'M';
+    if (n >= 1_000) return '$' + (n / 1_000).toFixed(1) + 'K';
+    return '$' + n.toFixed(0);
+}
+
+function animateCount(el, target, prefix = '', suffix = '') {
+    let start = 0, duration = 1000;
+    let step = target / (duration / 16);
+    let timer = setInterval(() => {
+        start = Math.min(start + step, target);
+        el.textContent = prefix + Math.round(start).toLocaleString('es-MX') + suffix;
+        if (start >= target) clearInterval(timer);
+    }, 16);
+}
+
+async function loadKpis() {
+    const d = await fetch('/Dashboard/GetKpis').then(r => r.json());
+    animateCount(document.getElementById('kpiProductos'), d.totalProductos);
+    animateCount(document.getElementById('kpiMovimientos'), d.totalMovimientos);
+    animateCount(document.getElementById('kpiCriticos'), d.productosCriticos);
+    document.getElementById('kpiValor').textContent = fmt(d.valorInventario);
+    animateCount(document.getElementById('kpiEntradas'), d.entradas);
+    animateCount(document.getElementById('kpiSalidas'), d.salidas);
+}
+
+async function loadMovimientosPorMes() {
+    const d = await fetch('/Dashboard/GetMovimientosPorMes').then(r => r.json());
+    const opts = {
+        ...baseOpts,
+        chart: { ...baseOpts.chart, type: 'area', height: 290 },
+        series: [
+            { name: 'Entradas', data: d.entradas },
+            { name: 'Salidas',  data: d.salidas }
+        ],
+        xaxis: { categories: d.labels, labels: { rotate: -30, style: { fontSize: '11px' } } },
+        colors: [PALETTE.green, PALETTE.red],
+        fill: { type: 'gradient', gradient: { opacityFrom: 0.45, opacityTo: 0.05 } },
+        stroke: { curve: 'smooth', width: 2.5 },
+        legend: { position: 'top' },
+        yaxis: { labels: { formatter: v => v.toLocaleString('es-MX') } }
+    };
+    if (charts.movimientos) { charts.movimientos.updateOptions(opts); }
+    else { charts.movimientos = new ApexCharts(document.getElementById('chartMovimientos'), opts); charts.movimientos.render(); }
+}
+
+async function loadDona() {
+    const d = await fetch('/Dashboard/GetBalanceMovimientos').then(r => r.json());
+    const total = d.entradas + d.salidas;
+    const opts = {
+        ...baseOpts,
+        chart: { ...baseOpts.chart, type: 'donut', height: 290 },
+        series: [d.entradas, d.salidas],
+        labels: ['Entradas', 'Salidas'],
+        colors: [PALETTE.green, PALETTE.red],
+        legend: { position: 'bottom' },
+        plotOptions: { pie: { donut: { size: '68%', labels: {
+            show: true,
+            total: { show: true, label: 'Total', formatter: () => total.toLocaleString('es-MX') }
+        }}}},
+        dataLabels: { formatter: (val) => val.toFixed(1) + '%' }
+    };
+    if (charts.dona) { charts.dona.updateOptions(opts); }
+    else { charts.dona = new ApexCharts(document.getElementById('chartDona'), opts); charts.dona.render(); }
+}
+
+async function loadEstado() {
+    const d = await fetch('/Dashboard/GetEstadoStock').then(r => r.json());
+    const opts = {
+        ...baseOpts,
+        chart: { ...baseOpts.chart, type: 'pie', height: 290 },
+        series: [d.normal, d.critico, d.sinStock],
+        labels: ['Normal', 'Crítico', 'Sin Stock'],
+        colors: [PALETTE.green, PALETTE.yellow, PALETTE.red],
+        legend: { position: 'bottom' },
+        dataLabels: { formatter: (val, opts) => opts.w.globals.series[opts.seriesIndex].toLocaleString('es-MX') }
+    };
+    if (charts.estado) { charts.estado.updateOptions(opts); }
+    else { charts.estado = new ApexCharts(document.getElementById('chartEstado'), opts); charts.estado.render(); }
+}
+
+async function loadCategorias() {
+    const d = await fetch('/Dashboard/GetStockPorCategoria').then(r => r.json());
+    const opts = {
+        ...baseOpts,
+        chart: { ...baseOpts.chart, type: 'bar', height: 290 },
+        series: [{ name: 'Unidades en Stock', data: d.stock }],
+        xaxis: { categories: d.labels, labels: { style: { fontSize: '11px' } } },
+        colors: [PALETTE.blue],
+        plotOptions: { bar: { borderRadius: 4, horizontal: false, columnWidth: '55%' } },
+        dataLabels: { enabled: false },
+        yaxis: { labels: { formatter: v => v.toLocaleString('es-MX') } },
+        tooltip: { y: { formatter: v => v.toLocaleString('es-MX') + ' uds.' } }
+    };
+    if (charts.categorias) { charts.categorias.updateOptions(opts); }
+    else { charts.categorias = new ApexCharts(document.getElementById('chartCategorias'), opts); charts.categorias.render(); }
+}
+
+async function loadTopProductos() {
+    const d = await fetch('/Dashboard/GetTopProductosPorValor').then(r => r.json());
+    const opts = {
+        ...baseOpts,
+        chart: { ...baseOpts.chart, type: 'bar', height: 310 },
+        series: [{ name: 'Valor ($)', data: d.valores }],
+        xaxis: { categories: d.labels, labels: { style: { fontSize: '11px' } } },
+        colors: [PALETTE.purple],
+        plotOptions: { bar: { borderRadius: 5, horizontal: true } },
+        dataLabels: { enabled: false },
+        xaxis: { categories: d.labels },
+        yaxis: { labels: { style: { fontSize: '11px' } } },
+        tooltip: { x: { show: true }, y: { formatter: v => '$' + v.toLocaleString('es-MX', { minimumFractionDigits: 2 }) } }
+    };
+    if (charts.topProductos) { charts.topProductos.updateOptions(opts); }
+    else { charts.topProductos = new ApexCharts(document.getElementById('chartTopProductos'), opts); charts.topProductos.render(); }
+}
+
+async function loadAll() {
+    document.getElementById('lastUpdate').textContent = 'Actualizando…';
+    await Promise.all([loadKpis(), loadMovimientosPorMes(), loadDona(), loadEstado(), loadCategorias(), loadTopProductos()]);
+    const now = new Date().toLocaleTimeString('es-MX');
+    document.getElementById('lastUpdate').textContent = `Última actualización: ${now}`;
+}
+
+loadAll();
+</script>
+}
