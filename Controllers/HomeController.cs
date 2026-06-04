@@ -24,10 +24,8 @@ public class HomeController : Controller
             TotalProductos = await _context.Productos.CountAsync(),
             ProductosCriticos = await _context.Productos.CountAsync(p => p.Stock < p.StockMinimo),
             TotalMovimientos = await _context.Movimientos.CountAsync(),
-            ValorInventario = await _context.Productos
-                .Select(p => p.Stock * p.PrecioUnitario)
-                .DefaultIfEmpty(0)
-                .SumAsync()
+            ValorInventario = (await _context.Productos
+                .SumAsync(p => (decimal?)(p.Stock * p.PrecioUnitario))) ?? 0m
         };
 
         return View(model);
