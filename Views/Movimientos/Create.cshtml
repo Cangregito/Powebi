@@ -1,0 +1,51 @@
+@model InventarioApp.Models.MovimientoInventario
+
+@{
+    ViewData["Title"] = "Registrar Movimiento";
+}
+
+<h1 class="h3">Registrar Movimiento</h1>
+<hr />
+
+<form asp-action="Create" method="post" class="row g-3">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="col-md-6">
+        <label asp-for="ProductoId" class="form-label">Producto</label>
+        <select asp-for="ProductoId" class="form-select" asp-items="ViewBag.Productos"></select>
+        <span asp-validation-for="ProductoId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="Tipo" class="form-label"></label>
+        <select asp-for="Tipo" class="form-select" asp-items="ViewBag.Tipos"></select>
+        <span asp-validation-for="Tipo" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="Cantidad" class="form-label"></label>
+        <input asp-for="Cantidad" class="form-control" />
+        <span asp-validation-for="Cantidad" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="Fecha" class="form-label"></label>
+        <input asp-for="Fecha" type="datetime-local" class="form-control" value="@Model.Fecha.ToString("yyyy-MM-ddTHH:mm")" />
+        <span asp-validation-for="Fecha" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-8">
+        <label asp-for="Observacion" class="form-label"></label>
+        <input asp-for="Observacion" class="form-control" />
+        <span asp-validation-for="Observacion" class="text-danger"></span>
+    </div>
+
+    <div class="col-12">
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+    </div>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

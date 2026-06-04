@@ -1,0 +1,41 @@
+@model InventarioApp.Models.Producto
+
+@{
+    ViewData["Title"] = "Detalle de Producto";
+    var esCritico = Model.Stock < Model.StockMinimo;
+}
+
+<h1 class="h3">Detalle de Producto</h1>
+<hr />
+
+<dl class="row">
+    <dt class="col-sm-3">Nombre</dt>
+    <dd class="col-sm-9">@Model.Nombre</dd>
+
+    <dt class="col-sm-3">Categoria</dt>
+    <dd class="col-sm-9">@Model.Categoria?.Nombre</dd>
+
+    <dt class="col-sm-3">Precio Unitario</dt>
+    <dd class="col-sm-9">@Model.PrecioUnitario.ToString("C")</dd>
+
+    <dt class="col-sm-3">Stock</dt>
+    <dd class="col-sm-9">@Model.Stock</dd>
+
+    <dt class="col-sm-3">Stock Minimo</dt>
+    <dd class="col-sm-9">@Model.StockMinimo</dd>
+
+    <dt class="col-sm-3">Estado</dt>
+    <dd class="col-sm-9">
+        @if (esCritico)
+        {
+            <span class="badge text-bg-warning">Critico</span>
+        }
+        else
+        {
+            <span class="badge text-bg-success">Normal</span>
+        }
+    </dd>
+</dl>
+
+<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Editar</a>
+<a asp-action="Index" class="btn btn-outline-secondary">Volver</a>

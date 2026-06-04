@@ -1,0 +1,37 @@
+@model IEnumerable<InventarioApp.Models.MovimientoInventario>
+
+@{
+    ViewData["Title"] = "Movimientos";
+}
+
+<div class="page-header">
+    <h1>Movimientos de Inventario</h1>
+    <a asp-action="Create" class="btn-primary">Registrar Movimiento</a>
+</div>
+
+<div class="tabla-contenedor">
+    <table class="tabla-inventario">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Producto</th>
+                <th>Tipo</th>
+                <th>Cantidad</th>
+                <th>Observacion</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model)
+        {
+            var claseTipo = item.Tipo == TipoMovimiento.Entrada ? "badge-ok" : "badge-critico";
+            <tr>
+                <td>@item.Fecha.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                <td>@item.Producto?.Nombre</td>
+                <td><span class="@claseTipo">@item.Tipo</span></td>
+                <td>@item.Cantidad</td>
+                <td>@item.Observacion</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>

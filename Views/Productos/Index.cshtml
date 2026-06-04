@@ -1,0 +1,94 @@
+@model IEnumerable<InventarioApp.Models.Producto>
+
+@{
+    ViewData["Title"] = "Control de Inventario";
+}
+
+<div class="page-header">
+    <h1>Inventario de Productos</h1>
+    <a asp-action="Create" class="btn-primary">Nuevo Producto</a>
+</div>
+
+<div class="filtro-panel">
+    <input type="text" id="filtroTexto" placeholder="Buscar por nombre o categoria..." />
+    <select id="filtroCritico">
+            <option value="">Todos</option>
+            <option value="critico">Stock critico</option>
+            <option value="normal">Stock normal</option>
+    </select>
+</div>
+
+<div class="tabla-contenedor">
+<table id="tablaProductos" class="tabla-inventario">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Categoria</th>
+            <th>Precio Unitario</th>
+            <th>Stock Actual</th>
+            <th>Stock Minimo</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var producto in Model)
+    {
+        var esCritico = producto.Stock < producto.StockMinimo;
+        <tr class="fila-producto @(esCritico ? "critico" : "normal")"
+            data-nombre="@producto.Nombre.ToLower()"
+            data-categoria="@((producto.Categoria?.Nombre ?? string.Empty).ToLower())"
+            data-estado="@(esCritico ? "critico" : "normal")">
+            <td>@producto.Nombre</td>
+            <td>@producto.Categoria?.Nombre</td>
+            <td>$@producto.PrecioUnitario.ToString("N2")</td>
+            <td>@producto.Stock</td>
+            <td>@producto.StockMinimo</td>
+            <td>
+                @if (esCritico)
+                {
+                    <span class="badge-critico">Critico</span>
+                }
+                else
+                {
+                    <span class="badge-ok">Normal</span>
+                }
+            </td>
+            <td>
+                <div class="acciones">
+                    <a asp-action="Edit" asp-route-id="@producto.Id">Editar</a>
+                    <a asp-action="Details" asp-route-id="@producto.Id">Detalle</a>
+                    <a asp-action="Delete" asp-route-id="@producto.Id">Eliminar</a>
+                </div>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+</div>
+
+@section Scripts {
+<script>
+    const inputTexto = document.getElementById('filtroTexto');
+    const selectEstado = document.getElementById('filtroCritico');
+
+    function aplicarFiltros() {
+        const texto = inputTexto.value.toLowerCase();
+        const estado = selectEstado.value;
+
+        document.querySelectorAll('.fila-producto').forEach((fila) => {
+            const nombre = fila.dataset.nombre;
+            const categoria = fila.dataset.categoria;
+            const estadoFila = fila.dataset.estado;
+
+            const coincideTexto = nombre.includes(texto) || categoria.includes(texto);
+            const coincideEstado = estado === '' || estadoFila === estado;
+
+            fila.classList.toggle('fila-oculta', !(coincideTexto && coincideEstado));
+        });
+    }
+
+    inputTexto.addEventListener('input', aplicarFiltros);
+    selectEstado.addEventListener('change', aplicarFiltros);
+</script>
+}
