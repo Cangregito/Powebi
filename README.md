@@ -75,6 +75,10 @@ dotnet run
    - movimientos.csv
 3. En Power BI Desktop usar Obtener datos > Texto/CSV.
 4. Revisar guia detallada en docs/powerbi_dia3.md.
+5. Usar activos profesionales para cierre:
+   - docs/powerbi_assets/medidas_dax.md
+   - docs/powerbi_assets/tema_inventario.json
+   - docs/powerbi_publicacion_service.md
 
 ## 7. Enlaces de publicacion
 

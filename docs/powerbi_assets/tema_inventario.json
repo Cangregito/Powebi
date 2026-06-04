@@ -1,0 +1,32 @@
+{
+  "name": "Inventario Analitico",
+  "dataColors": [
+    "#1A3C5E",
+    "#2A9D8F",
+    "#E63946",
+    "#FFB703",
+    "#264653",
+    "#457B9D",
+    "#F4A261",
+    "#E76F51"
+  ],
+  "background": "#F4F6F9",
+  "foreground": "#1F2933",
+  "tableAccent": "#1A3C5E",
+  "visualStyles": {
+    "*": {
+      "title": [
+        {
+          "show": true,
+          "fontSize": 12,
+          "fontFamily": "Segoe UI",
+          "color": {
+            "solid": {
+              "color": "#1A3C5E"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
