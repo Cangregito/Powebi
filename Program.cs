@@ -50,4 +50,6 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
+app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
+
 app.Run();

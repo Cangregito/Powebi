@@ -9,7 +9,9 @@ Este documento traduce el plan a pasos ejecutables con el estado actual del proy
 3. Railway detecta .NET y usa railway.json para arranque.
 4. Configurar variables en Railway:
    - ASPNETCORE_ENVIRONMENT=Production
-   - ConnectionStrings__DefaultConnection=Data Source=/data/inventario.db
+   - ASPNETCORE_URLS=http://0.0.0.0:8080
+   - ConnectionStrings__DefaultConnection=Data Source=/tmp/inventario.db
+   - DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
 5. Desplegar.
 
 Nota: la app aplica migraciones automaticamente al iniciar.
@@ -33,6 +35,7 @@ Nota: la app aplica migraciones automaticamente al iniciar.
 ## 4. Checklist de validacion post deploy
 
 - App abre URL publica sin error.
+- Health endpoint responde OK en /health.
 - Inventario permite crear, editar y eliminar productos.
 - Movimientos actualizan stock correctamente.
 - Exportaciones CSV funcionan.

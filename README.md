@@ -84,6 +84,7 @@ dotnet run
 
 - Dashboard Power BI Service: pendiente
 - App desplegada: https://inventario-analitico-production.up.railway.app
+- Health check: https://inventario-analitico-production.up.railway.app/health
 
 ## 8. Despliegue
 
@@ -100,8 +101,8 @@ Completado:
 - Filtro en Inventario sin recarga
 - Estilos responsivos con Grid para Inventario
 - Exportacion CSV para alimentar Power BI
+- App desplegada en Railway y validada en produccion
 
 Pendiente:
 
-- Publicacion de app en internet
 - Publicacion del dashboard en Power BI Service
