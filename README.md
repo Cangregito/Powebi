@@ -2,6 +2,8 @@
 
 Proyecto de demostracion para entrevista de Analista de Datos Jr con Power BI.
 
+Repositorio: https://github.com/Cangregito/Powebi.git
+
 ## 1. Proposito del proyecto
 
 Construir una aplicacion web para administrar inventario (productos, categorias y movimientos) y usar esos datos como fuente analitica en Power BI para visualizar KPIs clave:
