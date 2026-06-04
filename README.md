@@ -79,7 +79,7 @@ dotnet run
 ## 7. Enlaces de publicacion
 
 - Dashboard Power BI Service: pendiente
-- App desplegada: pendiente
+- App desplegada: https://inventario-analitico-production.up.railway.app
 
 ## 8. Despliegue
 
