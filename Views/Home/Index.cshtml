@@ -1,8 +1,52 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model InventarioApp.Models.HomeDashboardViewModel
+
+@{
+    ViewData["Title"] = "Panel General";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="page-header">
+    <h1>Control de Inventario</h1>
+</div>
+
+<p class="mb-4">Sistema operativo para gestionar inventario y generar analitica en Power BI.</p>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h6 class="text-muted">Total Productos</h6>
+                <div class="fs-4 fw-bold">@Model.TotalProductos</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h6 class="text-muted">Stock Critico</h6>
+                <div class="fs-4 fw-bold text-warning">@Model.ProductosCriticos</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h6 class="text-muted">Movimientos</h6>
+                <div class="fs-4 fw-bold">@Model.TotalMovimientos</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h6 class="text-muted">Valor Inventario</h6>
+                <div class="fs-4 fw-bold">$@Model.ValorInventario.ToString("N2")</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex flex-wrap gap-2">
+    <a class="btn btn-primary" asp-controller="Productos" asp-action="Index">Gestionar Inventario</a>
+    <a class="btn btn-outline-primary" asp-controller="Movimientos" asp-action="Index">Registrar Movimientos</a>
+    <a class="btn btn-outline-secondary" asp-controller="Export" asp-action="Index">Exportar Datos para Power BI</a>
 </div>
