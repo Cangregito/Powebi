@@ -19,13 +19,16 @@ public class HomeController : Controller
 
     public async Task<IActionResult> Index()
     {
+        var productos = await _context.Productos
+            .Select(p => new { p.Stock, p.PrecioUnitario })
+            .ToListAsync();
+
         var model = new HomeDashboardViewModel
         {
-            TotalProductos = await _context.Productos.CountAsync(),
+            TotalProductos = productos.Count,
             ProductosCriticos = await _context.Productos.CountAsync(p => p.Stock < p.StockMinimo),
             TotalMovimientos = await _context.Movimientos.CountAsync(),
-            ValorInventario = (await _context.Productos
-                .SumAsync(p => (decimal?)(p.Stock * p.PrecioUnitario))) ?? 0m
+            ValorInventario = productos.Sum(p => p.Stock * p.PrecioUnitario)
         };
 
         return View(model);
